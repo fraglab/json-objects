@@ -41,6 +41,18 @@ def test_unserializable():
         dumps(A())
 
 
+def test_unknown_type():
+    data = '{"__type__": "Class", "__module__": "module", "str": "str"}'
+
+    o = loads(data)
+    o_ = loads(data)
+
+    assert o.str == 'str'
+    assert type(o).__name__ == 'Class'
+    assert o.__module__ == 'module'
+    assert type(o) == type(o_)
+
+
 def serializable_class(**kwargs):
     class A(Serializable):
         def __init__(self, **kwargs):
@@ -51,7 +63,11 @@ def serializable_class(**kwargs):
 
 def test_class_serialization():
     a = serializable_class(a=1)
-    assert loads(dumps(a)).a == 1
+
+    a_ = loads(dumps(a))
+
+    assert a_.a == 1
+    assert type(a_) == type(a)
 
 
 def test_class_encode_decode():
